@@ -281,9 +281,7 @@ public class Deal {
         player2.setCards(player2Cards());
 
 
-//        playerOneFinal1cards =  setFinalCards(player1.getPlayersCards());
-//        playerTwoFinal1cards = setFinalCards(player1.getPlayersCards());
-//
+
         player1.setFinalSet(setFinalCards(player1.getPlayersCards()));
         player2.setFinalSet(setFinalCards(player2.getPlayersCards()));
 
@@ -302,10 +300,7 @@ public class Deal {
         Random random = new Random();
         for (int i = 0; i < 5; i++) {
             int los = random.nextInt(51 - i);// indeks od 0 do 51 - 52 kart w talii
-            /*
-
-//            int los = random.nextInt(deckStolowa.getDeck().size());
-//             */
+          
             cardStol.add(deckStolowa.getDeck().get(los));
             deckStolowa.getDeck().remove(los);
 
