@@ -1,0 +1,255 @@
+package War;
+
+public class Main {
+
+
+    public static void main(String[] args)
+    {
+        
+        Deal deal = new Deal();
+    }
+}
+
+public class Card {
+
+    private int rank;
+    private int suit;
+    private int value;
+
+    public Card(int rank, int suit, int value) {
+        this.rank = rank;
+        this.suit = suit;
+        this.value = value;
+    }
+    public int getValue() {
+        return value;
+    }
+    public int getRank() {
+        return rank;
+    }
+    public int getSuit()
+    {
+        return suit;
+    }
+
+    @Override
+    public String toString() {
+
+
+        String[] color = {"Clubs", "Hearts", "Diamond", "Spades"};
+        return   color[suit] +
+                " " + rank;
+    }
+}
+
+import java.util.Random;
+
+public class Deal {
+
+    private int player =1;
+    private Card[] playerOneCards = new Card[26];
+    private Card[] playerTwoCards;
+
+
+    public Deal() {
+        Card[] deck = new Card[52];
+        int index =0;
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 13; j++)
+            {
+                deck[index] = new Card(j,i, index);
+                index++;
+            }
+        }
+
+        shuffelShuttle(deck);
+
+
+        for (int  i=0; i <21; i++)
+        {
+            randomShuffle(deck);
+        }
+
+        playerOneCards = divideDeck(deck, player);
+        player++;
+        playerTwoCards = divideDeck(deck, 2);
+        play(playerOneCards, playerTwoCards);
+    }
+
+    private void play(Card[] playerDeckA, Card[] playerDeckB)
+    {
+
+        Card playerOneCard;
+        Card playerTwoCard;
+        int index =26;
+
+        while (true)
+        {
+
+            for (int i =0; i <index ; i++)
+            {
+
+                playerOneCard = playerDeckA[i];
+                playerTwoCard = playerDeckB[i];
+
+                System.out.println("compare " + playerOneCard.getValue() + " " + playerTwoCard.getValue());
+
+                if (playerOneCard.getValue() > playerTwoCard.getValue())
+                {
+                    System.out.println("remove 1");
+                    playerDeckA= reduceArray(playerDeckA);
+
+                }
+                if (playerOneCard.getValue() < playerTwoCard.getValue())
+                {
+                    System.out.println("remove 2");
+
+                    playerDeckB= reduceArray(playerDeckB);
+                }
+
+                index = checkIndexLenght(playerDeckA, playerDeckB);
+
+                if (index< i)
+                {
+                    i=index;
+                }
+            }
+            if (index==0)
+            {
+                chechWhoWon(playerDeckA);
+                break;
+            }
+        }
+        System.out.println( + playerDeckA.length + " " + playerDeckB.length);
+    }
+
+    private void chechWhoWon(Card[] one)
+    {
+
+        System.out.println("finish ");
+        int lenght = one.length;
+
+        if (lenght ==0)
+        {
+            System.out.println("player one has won");
+        }else
+        {
+            System.out.println("player 2 won");
+        }
+    }
+
+    private int checkIndexLenght(Card[] one, Card[] two)
+    {
+        int index;
+
+        if (one.length> two.length)
+        {
+            index = two.length;
+        }
+        else if (one.length< two.length)
+        {
+            index = one.length;
+        }
+        else
+        {
+            index =one.length;
+        }
+        return index;
+    }
+
+    private Card[] reduceArray(Card[] deck)
+    {
+        int lenght = deck.length-1;
+        Card[] reduceDeck = new Card[lenght];
+
+        for (int i=0; i <reduceDeck.length; i++)
+        {
+            reduceDeck[i] = deck[i+1];
+        }
+        return reduceDeck;
+    }
+
+
+    private  void shuffelShuttle(Card[] deck) {
+        int dividedDeck = deck.length / 2;
+
+        boolean selectDeck = false;
+
+        Card[] deckA = new Card[dividedDeck];
+        Card[] deckB = new Card[dividedDeck];
+
+
+
+        for (int i = 0; i < 26; i++) {
+            deckA[i] = deck[i];
+        }
+
+        for (int i = dividedDeck; i < deck.length; i++) {
+            deckB[i - dividedDeck] = deck[i];
+        }
+
+
+        for (int i = 0, j = 0, k = 0; i < 52; i++) {
+
+            if (!selectDeck) {
+                deck[i] = deckA[j];
+
+                System.out.println(i + " " + selectDeck);
+                j++;
+                selectDeck = true;
+                continue;
+            }
+            if (selectDeck) {
+                deck[i] = deckB[k];
+                System.out.println(i + " " + selectDeck);
+                k++;
+
+                selectDeck = false;
+                continue;
+            }
+        }
+    }
+
+    private void randomShuffle(Card[] deck) {
+        Random random = new Random();
+
+        int drawOne = random.nextInt(51);
+        int draToChange = random.nextInt(51);
+        Card temp;
+
+        temp = deck[drawOne];
+        deck[drawOne] = deck[draToChange];
+        deck[draToChange] = temp;
+    }
+
+    private Card[] divideDeck(Card[] deck, int p)
+    {
+
+        Card[] playersDeck = new Card[26];
+        Card temp;
+
+        if (p==1)
+        {
+            for (int i = 0; i < 26; i++)
+            {
+
+                temp = deck[i];
+                playersDeck[i] = temp;
+            }
+        }
+        if (p==2)
+        {
+
+            for (int i = 26, j=0; i < 52; i++, j++)
+            {
+                temp = deck[i];
+                playersDeck[j] = temp;
+            }
+        }
+
+        return playersDeck;
+    }
+    
+}
+
