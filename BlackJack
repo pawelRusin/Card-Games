@@ -1,0 +1,412 @@
+package BlackJack;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Deck deck = new Deck();
+        Player player = Player.getInstance();
+
+        player.setName("John");
+        Casino casino = new Casino("Royal");
+        Deal deal = new Deal(deck, player, casino);
+    }
+}
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Player {
+
+    private String name;
+    private List<Card> playerCards = new ArrayList<>();
+    private Scanner scanner = new Scanner(System.in);
+    private static Player ourInstance = new Player();
+
+    public static Player getInstance() {
+        return ourInstance;
+    }
+
+    private Player() {
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Card> getPlayerCards() {
+        return playerCards;
+    }
+
+    public void addCard(Card card)
+    {
+        playerCards.add(card);
+
+        for (Card c : playerCards)
+        {
+            System.out.println(this.name + " has: " + c);
+
+        }
+        int points = countPoints();
+
+        if (points == 21)
+        {
+            System.out.println("you won");
+
+        }
+        if (points >= 22)
+
+        {
+            System.out.println("you lost");
+        }
+
+
+        System.out.println("point: " + points);
+
+    }
+
+    public int countPoints()
+    {
+        int points = 0;
+
+        for (Card c : playerCards)
+        {
+            points += c.getValue();
+
+        }
+       return points;
+    }
+
+    public boolean decision()
+    {
+        System.out.println("do you want next card: y/n");
+
+        String answer = scanner.nextLine();
+
+        if (answer.equals("y"))
+        {
+            return true;
+
+        }
+        else if (answer.equals("n"))
+        {
+            return false;
+        }
+        else
+        {
+            System.out.println("please answer y/n ");
+        }
+        decision();
+        return false;
+    }
+}
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Casino {
+
+    private  String name;
+    private List<Card> casinoCards = new ArrayList<>();
+    private Player player = Player.getInstance();
+
+    public Casino(String name) {
+        this.name = name;
+    }
+
+    public void addCard(Card card)
+    {
+        casinoCards.add(card);
+
+        for (Card c : casinoCards)
+        System.out.println(this.name + " has: " + c);
+
+        int points = countPoint();
+        System.out.println("points " + points);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int countPoint()
+    {
+        int points = 0;
+
+        for (Card c : casinoCards)
+        {
+            points += c.getValue();
+        }
+
+        return points;
+    }
+
+    public boolean decision()
+    {
+
+        boolean decision = countPoints();
+
+        if (decision)
+            return true;
+        else
+        return false;
+    }
+    private boolean countPoints()
+    {
+        int points = 0;
+        int p = playersPoint();
+
+        for (Card c : casinoCards)
+        {
+            points += c.getValue();
+        }
+
+        if (points < 18)
+            return true;
+
+        else if (points<19 && p > points)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+    private int playersPoint()
+    {
+        int playerspoints = 0;
+        List<Card> playerCard = player.getPlayerCards();
+
+        for (Card c : playerCard)
+        {
+            playerspoints+= c.getValue();
+        }
+        return playerspoints;
+    }
+}
+
+
+import java.util.*;
+
+public class Deck {
+
+
+    private Set<COLOR> setOfColors = EnumSet.allOf(COLOR.class);
+    private List<Card> deckList = new ArrayList<Card>();
+    private COLOR[] colors = COLOR.values();
+
+
+
+    public List<Card> getDeckList() {
+        return deckList;
+    }
+
+    public Deck()
+    {
+        setOfColors = new HashSet<>();
+
+        for (int i = 0; i < colors.length; i++)
+        {
+            for (int j =1, k =1;j<14; j++, k++ )
+            {
+                deckList.add(new Card(k, colors[i]));
+
+            }
+        }
+    }
+}
+
+
+enum COLOR {DIAMONDS, HEARTS,CLUBS, SPADES}
+
+public class Card implements Comparable<Poker.Card> {
+
+
+    private int rank;
+    private BlackJack.COLOR COLOR;
+    private int value;
+
+    public Card(int rank, BlackJack.COLOR COLOR) {
+
+        this.rank = rank;
+        this.COLOR = COLOR;
+        setValue();
+    }
+
+
+
+    public int getValue() {
+        return value;
+    }
+
+    private void setValue()
+    {
+        int[] values = {0,11,2,3,4,5,6,7,8,9,10,2,3,4};
+        value = values[rank];
+    }
+
+
+    public int getRank() {
+        return rank;
+    }
+
+    public BlackJack.COLOR getCOLOR() {
+        return COLOR;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int compareTo(Poker.Card k) {
+
+        return this.toString().compareTo(k.toString());
+    }
+
+    @Override
+    public String toString() {
+        return  rank +" "
+                + COLOR + " " + value
+                ;
+    }
+}
+
+
+
+import java.util.Collections;
+
+public class Deal {
+
+    private Deck deck;
+    private Player player;
+    private Casino casino;
+    private boolean turn= true;
+    private boolean quit= true;
+    
+
+    public Deal(Deck deck, Player player, Casino casino)
+    {
+        this.deck = deck;
+        this.player = player;
+        this.casino = casino;
+
+        Collections.shuffle(deck.getDeckList());
+
+        game();
+    }
+
+    private void game()
+    {
+        boolean pdecision = true;
+
+        playerAdd();
+        casinoAdd();
+
+        while (quit)
+        {
+            boolean cdecision;
+
+
+            if (pdecision)
+            {
+                playerAdd();
+
+                int p = player.countPoints();
+                if (p >= 21 )
+                    break;
+            }
+
+            else
+            {
+                cdecision = casino.decision();
+                if (cdecision)
+                casinoAdd();
+                int p = casino.countPoint();
+                if (p >= 21 )
+                {
+                    breakGame();
+                    break;
+                }
+            }
+
+            cdecision = casino.decision();
+            if (cdecision)
+                casinoAdd();
+            int p = casino.countPoint();
+            if (p >= 21 )
+
+            {
+                breakGame();
+                break;
+            }
+            if (pdecision)
+            pdecision = player.decision();
+
+            if (!pdecision && !cdecision)
+            {
+                quit = false;
+                count();
+            }
+        }
+    }
+
+    private void breakGame()
+    {
+
+        int casinoP = casino.countPoint();
+
+        if (casinoP == 21)
+        {
+            System.out.println("casino won");
+
+        }
+        if (casinoP >= 22)
+
+        {
+            System.out.println("casino lost");
+        }
+
+    }
+
+    private void count()
+    {
+        int playerP = player.countPoints();
+        int casinoP = casino.countPoint();
+
+        if (playerP > casinoP)
+        {
+            System.out.println("player " + player.getName() + " won");
+        }
+        else if (playerP < casinoP)
+        {
+            System.out.println("casino " +  casino.getName() +  " won");
+        }else if (playerP == casinoP)
+        {
+            System.out.println("draw");
+        }
+    }
+
+    private void casinoAdd()
+    {
+        Card card = deck.getDeckList().get(0);
+        deck.getDeckList().remove(0);
+        casino.addCard(card);
+    }
+
+    private void playerAdd()
+    {
+        Card card = deck.getDeckList().get(0);
+        deck.getDeckList().remove(0);
+        player.addCard(card);
+    }
+}
