@@ -118,7 +118,7 @@ public class Deal {
                 break;
             }
         }
-        System.out.println( + playerDeckA.length + " " + playerDeckB.length);
+       
     }
 
     private void chechWhoWon(Card[] one)
